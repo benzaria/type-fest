@@ -178,6 +178,8 @@ Click the type names for complete docs.
 - [`DistributedPick`](source/distributed-pick.d.ts) - Picks keys from a type, distributing the operation over a union.
 - [`And`](source/and.d.ts) - Returns a boolean for whether two given types are both true.
 - [`Or`](source/or.d.ts) - Returns a boolean for whether either of two given types are true.
+- [`AndAll`](source/and.d.ts) - Returns a boolean for whether all given types are both true.
+- [`OrAll`](source/or.d.ts) - Returns a boolean for whether either of all given types are true.
 - [`NonEmptyTuple`](source/non-empty-tuple.d.ts) - Matches any non-empty tuple.
 - [`NonEmptyString`](source/non-empty-string.d.ts) - Matches any non-empty string.
 - [`FindGlobalType`](source/find-global-type.d.ts) - Tries to find the type of a global with the given name.
