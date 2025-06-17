@@ -27,25 +27,29 @@ Supports floating-point as a string.
 
 @example
 ```
-type A = IsNumberLike<'1'>;
+type A = IsNumberLike<1>;
 //=> true
 
-type B = IsNumberLike<'-1.1'>;
+type B = IsNumberLike<'1'>;
 //=> true
 
-type C = IsNumberLike<1>;
+type C = IsNumberLike<'-1.1'>;
 //=> true
 
-type D = IsNumberLike<'a'>;
+type D = IsNumberLike<'5e-20'>;
+//=> true
+
+type E = IsNumberLike<'a'>;
 //=> false
 */
+/* eslint-disable @stylistic/indent */
 export type IsNumberLike<N> =
-	N extends number ? true
-		:	N extends `${number}`
-			? true
-			: N extends `${number}.${number}`
-				? true
-				: false;
+	| N extends number ? true
+	: N extends `${number}` ? true
+	: N extends `${number}.${number}` ? true
+	: N extends `${number}e${'-' | '+'}${number}` ? true
+	: false;
+/* eslint-enable @stylistic/indent */
 
 /**
 Returns the minimum number in the given union of numbers.
@@ -64,9 +68,11 @@ export type UnionMin<N extends number> = InternalUnionMin<N>;
 The actual implementation of `UnionMin`. It's private because it has some arguments that don't need to be exposed.
 */
 type InternalUnionMin<N extends number, T extends UnknownArray = []> =
-	T['length'] extends N
+	IsNever<N> extends true
 		? T['length']
-		: InternalUnionMin<N, [...T, unknown]>;
+		: T['length'] extends N
+			? T['length']
+			: InternalUnionMin<N, [...T, unknown]>;
 
 /**
 Returns the maximum number in the given union of numbers.
@@ -87,7 +93,7 @@ The actual implementation of `UnionMax`. It's private because it has some argume
 type InternalUnionMax<N extends number, T extends UnknownArray = []> =
 	IsNever<N> extends true
 		? T['length']
-		:	T['length'] extends N
+		: T['length'] extends N
 			? InternalUnionMax<Exclude<N, T['length']>, T>
 			: InternalUnionMax<N, [...T, unknown]>;
 
