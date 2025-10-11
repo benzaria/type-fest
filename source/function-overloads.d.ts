@@ -1,4 +1,6 @@
 import type {FunctionWithMaybeThisParameter} from './internal/function.d.ts';
+import type {UnknownArray} from './unknown-array.d.ts';
+import type {Not} from './internal/type.d.ts';
 import type {IsEqual} from './is-equal.d.ts';
 
 /**
@@ -63,19 +65,16 @@ export type FunctionOverloads<T> = FunctionOverloadsInternal<T>;
 type FunctionOverloadsInternal<
 	AllOverloads,
 	CheckedOverloads = {},
-	MustStopIfParametersAreEqual extends boolean = true,
-	LastParameters = never,
+	MustStopIfOverloadIsEqual extends boolean = true,
+	LastOverload extends UnknownArray = [],
 > = AllOverloads extends (
 	this: infer ThisType,
-	...arguments_: infer ParametersType extends readonly unknown[]
+	...arguments_: infer ParametersType extends UnknownArray
 ) => infer ReturnType
 	? // This simultaneously checks if the last and the current parameters are equal and `MustStopIfParametersAreEqual` flag is true
 	IsEqual<
-		[LastParameters, true],
-		[
-			ParametersType,
-			[MustStopIfParametersAreEqual] extends [true] ? true : false, // Prevents distributivity
-		]
+		[...LastOverload, MustStopIfOverloadIsEqual],
+		[ThisType, ParametersType, ReturnType, true]
 	> extends true
 		? never
 		:
@@ -87,9 +86,9 @@ type FunctionOverloadsInternal<
 						// Thus, we're ending up iterating over all the overloads from bottom to top.
 						// Credits: https://github.com/microsoft/TypeScript/issues/32164#issuecomment-1146737709
 						CheckedOverloads & AllOverloads,
-						CheckedOverloads & ((this: ThisType, ...arguments_: ParametersType) => ReturnType),
-						MustStopIfParametersAreEqual extends true ? false : true,
-						ParametersType
+						CheckedOverloads & FunctionWithMaybeThisParameter<ThisType, ParametersType, ReturnType>,
+						Not<MustStopIfOverloadIsEqual>,
+						[ThisType, ParametersType, ReturnType]
 			>
 			| FunctionWithMaybeThisParameter<ThisType, ParametersType, ReturnType>
 	: never;

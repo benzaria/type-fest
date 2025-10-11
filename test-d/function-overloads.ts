@@ -107,3 +107,15 @@ expectType<never>(neverOverload);
 
 declare const unknownOverload: FunctionOverloads<unknown>;
 expectType<never>(unknownOverload);
+
+type ThisFunction1 = (this: {a: 1}, foo: string) => void;
+type ThisFunction2 = (this: {b: 2}, foo: string) => void;
+
+declare const thisOverloads: FunctionOverloads<ThisFunction1 & ThisFunction2>;
+expectType<ThisFunction1 | ThisFunction2>(thisOverloads);
+
+type ReturnFunction1 = (foo: string) => string;
+type ReturnFunction2 = (foo: string) => number;
+
+declare const returnOverloads: FunctionOverloads<ReturnFunction1 & ReturnFunction2>;
+expectType<ReturnFunction1 | ReturnFunction2>(returnOverloads);
